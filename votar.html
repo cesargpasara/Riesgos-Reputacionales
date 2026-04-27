@@ -242,7 +242,7 @@ async function submitVote(){
 
   try {
     // 1. Leer datos actuales
-    const getRes = await fetch(API+'/latest', {headers:{'X-Access-Key':JSONBIN_KEY}});
+    const getRes = await fetch(API+'/latest', {headers:{'X-Master-Key':JSONBIN_KEY}});
     const getData = await getRes.json();
     const votes = getData.record?.votes || [];
 
@@ -252,7 +252,7 @@ async function submitVote(){
     // 3. Guardar
     await fetch(API, {
       method:'PUT',
-      headers:{'Content-Type':'application/json','X-Access-Key':JSONBIN_KEY},
+      headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},
       body: JSON.stringify({votes})
     });
 
