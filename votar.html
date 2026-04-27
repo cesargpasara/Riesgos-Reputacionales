@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Priorización de Riesgos — Inteligo Group</title>
+<style>
+:root{--az:#0041a3;--azd:#00164f;--azc:#5785e1;--azp:#e1e9ff;--pl:#9ca5ba;--co:#b38864;--bg:#f4f6fb;--wh:#ffffff;--gm:#e8ecf5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Calibri',system-ui,sans-serif;background:var(--bg);color:var(--azd);min-height:100vh}
+.hdr{background:var(--azd);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:58px;border-bottom:3px solid var(--az)}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.lm{width:32px;height:32px;background:var(--az);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.lt{color:white;font-size:14px;font-weight:700}
+.ls{color:var(--pl);font-size:9px;letter-spacing:1.5px;text-transform:uppercase}
+.hdr-r{color:var(--azp);font-size:11px;text-align:right}
+.body{padding:28px 24px;max-width:720px;margin:0 auto}
+.aline{width:36px;height:3px;background:var(--az);border-radius:2px;margin-bottom:12px}
+.ttl{font-size:20px;font-weight:700;color:var(--azd);margin-bottom:5px}
+.sub{font-size:13px;color:var(--pl);margin-bottom:20px;line-height:1.5}
+.card{background:var(--wh);border:1px solid var(--gm);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.ch{background:var(--azd);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.ch span{color:white;font-size:12px;font-weight:700;letter-spacing:.3px}
+.badge{background:var(--az);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px}
+.cb{padding:12px}
+.alert{padding:10px 14px;border-radius:7px;font-size:13px;margin-bottom:14px;line-height:1.5;display:none}
+.alert.show{display:block}
+.alert.info{background:var(--azp);color:var(--azd);border-left:3px solid var(--az)}
+.alert.err{background:#fee2e2;color:#991b1b;border-left:3px solid #e53e3e}
+.alert.success{background:#dcfce7;color:#166534;border-left:3px solid #22c55e}
+input[type=text]{width:100%;padding:9px 13px;border:1.5px solid var(--gm);border-radius:7px;font-size:14px;font-family:inherit;color:var(--azd);outline:none;transition:border-color .2s;background:white}
+input[type=text]:focus{border-color:var(--az)}
+.btn{padding:9px 20px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.bp{background:var(--az);color:white}.bp:hover{background:#0052cc}
+.bs{background:transparent;color:var(--az);border:1.5px solid var(--az)}.bs:hover{background:var(--azp)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.risk-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;border:1px solid var(--gm);background:var(--bg);margin-bottom:5px;cursor:grab;transition:all .13s;user-select:none}
+.risk-item:hover{border-color:var(--azc);background:var(--azp)}
+.risk-item.dragging{opacity:.35}
+.risk-item.drag-over{border:1.5px dashed var(--az);background:#d6e4ff}
+.dh{color:var(--pl);font-size:12px;cursor:grab;flex-shrink:0}
+.rtext{flex:1;font-size:11px;color:var(--azd);line-height:1.3}
+.abtn{background:transparent;border:none;color:var(--az);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:3px;flex-shrink:0}
+.abtn:hover{background:var(--azp)}
+.rbtn{width:18px;height:18px;background:transparent;border:none;color:var(--pl);cursor:pointer;font-size:13px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rbtn:hover{background:#fee2e2;color:#e53e3e}
+.slot{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;border:1.5px dashed var(--gm);background:var(--bg);margin-bottom:5px;min-height:40px;transition:all .13s}
+.slot.filled{background:var(--azp);border:1.5px solid var(--azc);cursor:grab}
+.slot.filled:hover{border-color:var(--az)}
+.slot.drag-over{border-color:var(--az);background:#d6e4ff;border-style:dashed}
+.sn{width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--az);color:white}
+.sp{font-size:11px;color:var(--pl);font-style:italic}
+.spts{margin-left:auto;font-size:10px;font-weight:700;color:var(--az);background:white;padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.plgnd{background:var(--azp);border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--azd);line-height:1.6}
+.plgnd strong{color:var(--az)}
+.subbar{background:white;border:1px solid var(--gm);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px;flex-wrap:wrap}
+.si{font-size:12px;color:var(--pl)}
+.si strong{color:var(--azd)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--gm);border-top-color:var(--az);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-screen{text-align:center;padding:48px 24px;display:none}
+.success-icon{width:64px;height:64px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px}
+.success-title{font-size:20px;font-weight:700;color:var(--azd);margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--pl);line-height:1.5}
+@media(max-width:640px){.two{grid-template-columns:1fr}.body{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="lm">
+      <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5" fill="white" opacity=".6"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".6"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5" fill="white" opacity=".3"/>
+      </svg>
+    </div>
+    <div><div class="lt">Inteligo Group</div><div class="ls">Risk Management</div></div>
+  </div>
+  <div class="hdr-r">Priorización de Riesgos Reputacionales</div>
+</div>
+
+<div class="body">
+
+  <!-- PANTALLA DE ÉXITO -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">✓</div>
+    <div class="success-title">¡Voto registrado!</div>
+    <div class="success-sub">Gracias por participar.<br>Tu priorización ha sido guardada correctamente.</div>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div id="form-area">
+    <div class="aline"></div>
+    <div class="ttl">Priorización de riesgos reputacionales</div>
+    <div class="sub">Selecciona los 6 riesgos que consideras más importantes y ordénalos por prioridad. El más importante va en el puesto 1.</div>
+
+    <div class="alert info show" id="alert-info">
+      Sistema de puntos: <strong>1° → 6 pts &nbsp;|&nbsp; 2° → 5 pts &nbsp;|&nbsp; 3° → 4 pts &nbsp;|&nbsp; 4° → 3 pts &nbsp;|&nbsp; 5° → 2 pts &nbsp;|&nbsp; 6° → 1 pt</strong>
+    </div>
+    <div class="alert err" id="alert-err"></div>
+
+    <!-- NOMBRE -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="ch"><span>Tu nombre</span></div>
+      <div class="cb">
+        <input type="text" id="inp-name" placeholder="Escribe tu nombre completo" />
+      </div>
+    </div>
+
+    <!-- VOTACIÓN -->
+    <div class="two">
+      <div class="card">
+        <div class="ch"><span>Riesgos disponibles</span><span class="badge" id="pool-cnt">20</span></div>
+        <div class="cb" id="risk-pool"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span>Mi selección</span><span class="badge" id="sel-cnt">0/6</span></div>
+        <div class="cb">
+          <div class="plgnd"><strong>Arrastra</strong> los riesgos aquí o usa el botón <strong>+</strong></div>
+          <div id="slots"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subbar">
+      <div class="si">Selecciona exactamente <strong>6 riesgos</strong> en orden de prioridad</div>
+      <button class="btn bp" id="btn-submit" onclick="submitVote()">Registrar voto ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIGURACIÓN — edita solo estas 2 líneas
+// ══════════════════════════════════════════════
+const JSONBIN_ID  = '69ef9c3c856a6821897bc35b';
+const JSONBIN_KEY = '$2a$10$IeTMT3ndXlVHlyfypr5vNuUljpMMNRiWLR6YOF3lTrjUnyT3g8uSG';
+// ══════════════════════════════════════════════
+
+const RISKS = [
+  "Problemas de ciberseguridad, filtración de información y fallas informáticas",
+  "Prácticas poco éticas de líderes y colaboradores",
+  "Accidentes relacionados con infraestructuras y tecnologías deficientes",
+  "Difusión de información falsa, suplantación de identidad y ciberataques no resueltos",
+  "Situaciones de acoso a colaboradores o clientes",
+  "Incumplimiento de garantías de seguridad en productos, servicios e infraestructura",
+  "Denuncias o investigaciones por prácticas empresariales cuestionadas",
+  "Intervenciones políticas en beneficio del grupo",
+  "Exposición de trabajadores y clientes a situaciones de violencia, robos y extorsiones",
+  "Déficits de comunicación y vocería en medios y redes sociales",
+  "Acciones contrarias a la equidad de género e igualdad de oportunidades",
+  "Exclusión de poblaciones vulnerables, acceso a servicios y productos",
+  "Procesos, atención y servicios o productos deficientes",
+  "Percepción de abuso de poder o dominio económico",
+  "Vulneración de derechos laborales, conflictos sindicales y modalidades de contratación",
+  "Contaminación o afectación a la biodiversidad de productos y servicios",
+  "Incumplimiento de disposiciones legales, contables y tributarias",
+  "Ocultamiento o demora de información ante eventos relevantes",
+  "Opacidad en relaciones contractuales y financieras con el Estado",
+  "Publicidad y comunicación engañosa sobre productos y servicios"
+];
+const PTS = [6,5,4,3,2,1];
+const API = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+
+let selected = [null,null,null,null,null,null];
+let dragSrcType = null, dragSrcIdx = null;
+
+function showErr(msg){ const e=document.getElementById('alert-err'); e.innerHTML=msg; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),4000); }
+
+function getAvail(){ return RISKS.map((r,i)=>({text:r,idx:i})).filter(r=>!selected.includes(r.idx)); }
+
+function renderPool(){
+  const pool=document.getElementById('risk-pool');
+  const avail=getAvail();
+  document.getElementById('pool-cnt').textContent=avail.length;
+  pool.innerHTML='';
+  if(!avail.length){pool.innerHTML='<div style="text-align:center;padding:16px;font-size:11px;color:var(--pl)">Todos seleccionados</div>';return;}
+  avail.forEach(r=>{
+    const el=document.createElement('div');
+    el.className='risk-item'; el.draggable=true;
+    el.innerHTML=`<span class="dh">⠿</span><span class="rtext">${r.text}</span><button class="abtn" onclick="addNext(${r.idx})">+</button>`;
+    el.addEventListener('dragstart',e=>{dragSrcType='pool';dragSrcIdx=r.idx;e.dataTransfer.effectAllowed='move';el.classList.add('dragging')});
+    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    pool.appendChild(el);
+  });
+}
+
+function addNext(idx){
+  const s=selected.indexOf(null);
+  if(s===-1){showErr('Ya seleccionaste 6 riesgos. Quita uno para agregar otro.');return;}
+  selected[s]=idx; renderPool(); renderSlots();
+}
+
+function renderSlots(){
+  const c=document.getElementById('slots');
+  const filled=selected.filter(x=>x!==null).length;
+  document.getElementById('sel-cnt').textContent=filled+'/6';
+  c.innerHTML='';
+  selected.forEach((rIdx,si)=>{
+    const el=document.createElement('div');
+    el.className='slot'+(rIdx!==null?' filled':'');
+    const gold=si===0?'#b8860b':si===1?'#9ca5ba':si===2?'#b38864':'#0041a3';
+    if(rIdx!==null){
+      el.draggable=true;
+      el.innerHTML=`<div class="sn" style="background:${gold}">${si+1}</div><div class="rtext">${RISKS[rIdx]}</div><div class="spts">${PTS[si]}p</div><button class="rbtn" onclick="removeSlot(${si})">×</button>`;
+      el.addEventListener('dragstart',e=>{dragSrcType='slot';dragSrcIdx=si;e.dataTransfer.effectAllowed='move';el.classList.add('dragging')});
+      el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    } else {
+      el.innerHTML=`<div class="sn" style="background:var(--gm);color:var(--pl)">${si+1}</div><div class="sp">Arrastra aquí o usa +</div>`;
+    }
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over')});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');handleDrop(si)});
+    c.appendChild(el);
+  });
+}
+
+function handleDrop(target){
+  if(dragSrcType==='pool'){selected[target]=dragSrcIdx;}
+  else{const t=selected[target];selected[target]=selected[dragSrcIdx];selected[dragSrcIdx]=t;}
+  renderPool(); renderSlots();
+}
+
+function removeSlot(si){
+  selected[si]=null;
+  const f=selected.filter(x=>x!==null);
+  selected=[...f,...Array(6-f.length).fill(null)];
+  renderPool(); renderSlots();
+}
+
+async function submitVote(){
+  const name=document.getElementById('inp-name').value.trim();
+  if(!name){showErr('Por favor escribe tu nombre antes de continuar.');return;}
+  if(selected.filter(x=>x!==null).length<6){showErr('Debes seleccionar exactamente 6 riesgos.');return;}
+
+  const btn=document.getElementById('btn-submit');
+  btn.innerHTML='<span class="spinner"></span>Guardando...';
+  btn.disabled=true;
+
+  try {
+    // 1. Leer datos actuales
+    const getRes = await fetch(API+'/latest', {headers:{'X-Access-Key':JSONBIN_KEY}});
+    const getData = await getRes.json();
+    const votes = getData.record?.votes || [];
+
+    // 2. Agregar nuevo voto
+    votes.push({name, picks:[...selected], ts: new Date().toISOString()});
+
+    // 3. Guardar
+    await fetch(API, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Access-Key':JSONBIN_KEY},
+      body: JSON.stringify({votes})
+    });
+
+    document.getElementById('form-area').style.display='none';
+    document.getElementById('success-screen').style.display='block';
+
+  } catch(e) {
+    showErr('Error al guardar el voto. Verifica tu conexión e intenta nuevamente.');
+    btn.innerHTML='Registrar voto ✓';
+    btn.disabled=false;
+  }
+}
+
+renderPool(); renderSlots();
+</script>
+</body>
+</html>
