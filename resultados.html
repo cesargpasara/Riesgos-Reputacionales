@@ -177,7 +177,7 @@ async function loadAndRender(){
   document.getElementById('loading').style.display='block';
   document.getElementById('results').style.display='none';
   try {
-    const res = await fetch(API+'/latest',{headers:{'X-Access-Key':JSONBIN_KEY}});
+    const res = await fetch(API+'/latest',{headers:{'X-Master-Key':JSONBIN_KEY}});
     const data = await res.json();
     allVotes = data.record?.votes || [];
     render(allVotes);
@@ -248,14 +248,14 @@ function render(votes){
 async function deleteVoter(i){
   if(!confirm(`¿Eliminar el voto de "${allVotes[i]?.name}"?`)) return;
   allVotes.splice(i,1);
-  await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':JSONBIN_KEY},body:JSON.stringify({votes:allVotes})});
+  await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},body:JSON.stringify({votes:allVotes})});
   render(allVotes);
 }
 
 async function clearAll(){
   if(!confirm('¿Borrar TODOS los votos? Esta acción no se puede deshacer.')) return;
   allVotes=[];
-  await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':JSONBIN_KEY},body:JSON.stringify({votes:[]})});
+  await fetch(API,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':JSONBIN_KEY},body:JSON.stringify({votes:[]})});
   render([]);
 }
 
